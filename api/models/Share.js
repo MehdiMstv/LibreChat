@@ -152,7 +152,8 @@ async function createSharedLink(user, { conversationId, ...shareData }) {
         messages: anonymizeMessages(share.messages, newConvoId),
       });
     }
-
+    
+    const conversation = await getConvo({user, conversationId});
     const shareId = nanoid();
     const messages = await getMessages({ conversationId });
     const update = { ...shareData, shareId, messages, user };
@@ -186,7 +187,8 @@ async function updateSharedLink(user, { conversationId, ...shareData }) {
     if (!share) {
       return { message: 'Share not found' };
     }
-
+    
+    const conversation = await getConvo({user, conversationId});
     const messages = await getMessages({ conversationId });
     const update = { ...shareData, messages, user };
     const updatedShare = await SharedLink.findOneAndUpdate({ conversationId, user }, update, {
@@ -215,6 +217,7 @@ async function updateSharedLink(user, { conversationId, ...shareData }) {
  */
 async function deleteSharedLink(user, { shareId }) {
   try {
+    const conversation = await getConvo({user, conversationId});
     const result = await SharedLink.findOneAndDelete({ shareId, user });
     return result ? { message: 'Share deleted successfully' } : { message: 'Share not found' };
   } catch (error) {
